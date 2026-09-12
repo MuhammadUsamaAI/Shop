@@ -18,13 +18,16 @@ class Inventory(Base):
     brand: Mapped[Optional[str]] = mapped_column(String(30))
     item_type: Mapped[Optional[str]] = mapped_column(String(30))
     date_created: Mapped[str] = mapped_column(String(30))
-    price: Mapped[int] = mapped_column(Integer)
+    price_each: Mapped[int] = mapped_column(Integer)
+    quantity: Mapped[int] = mapped_column(Integer)
+    total_price: Mapped[int] = mapped_column(Integer)
 
     def __repr__(self):
         return (
             f"Inventory(item_id={self.id}, item_name={self.item}, "
             f"item_brand={self.brand}, item_type={self.item_type}, "
-            f"date_created={self.date_created})"
+            f"item_price={self.price_each}, item_quantity={self.quantity}, "
+            f"date_created={self.date_created}, total_items_price={self.total_price})"
         )
 
 class InventoryManager:
@@ -32,11 +35,13 @@ class InventoryManager:
         self.engine = create_engine(db_url, echo=False)
         Base.metadata.create_all(self.engine)
 
-    def to_db(self, name: str, brand: str, type_: str, price: int | str, date_time: str) -> None:
+    def to_db(self, name: str, brand: str, type_: str, price_each: int | str,quantity: int|str , date_time: str,
+              total_price:int|str) -> None:
         with Session(self.engine) as session:
             session.add(Inventory(
                 item=name, brand=brand, item_type=type_,
-                price=price, date_created=date_time
+                price_each=price_each, quantity=quantity,
+                date_created=date_time, total_price = total_price
             ))
             session.commit()
 
@@ -50,10 +55,10 @@ class InventoryManager:
         choice = input("Do you want to add an item? (y/n): ").strip().lower()
 
         if choice in ['yes', 'y']:
-            name, brand, type_, price, date_time = schema_validator()
-            print("\n📦 Created Object Blueprint:\n", name, brand, type_, price, date_time)
-            self.to_db(name, brand, type_, price, date_time)
-            drawr.balance+=price
+            name, brand, type_, price_each, quantity, date_time, total_price = schema_validator()
+            print("\n📦 Created Object Blueprint:\n", name, brand, type_, price_each, quantity, date_time, total_price)
+            self.to_db(name, brand, type_, price_each, quantity, date_time, total_price)
+            drawr.balance+=total_price
             print('✨ Addition To DB Successful!\n')
             time.sleep(1)
             return True
