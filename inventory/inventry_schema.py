@@ -34,12 +34,13 @@ class InventorySchema(BaseModel):
 
 
 
-# item = Inventory_Schema(
-#     name='asg',
+# item = InventorySchema(
+#     name='ddg',
+#     brand=55,
 #     price_each=100,
 #     type_='half_pack',
 #     quantity=5
 # )
-#
+
 # print(item)
 # Output: name='asg' brand=None price_each=100 purchase_date='...' type_='half_pack' quantity=5 total_price=500

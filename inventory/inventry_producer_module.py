@@ -1,18 +1,28 @@
 import time
 from pydantic import TypeAdapter, ValidationError
-from typing import Any, Callable, Optional, Literal, Tuple
+from typing import Any, Callable, Optional, Literal, Tuple, Annotated
 from .inventry_schema import InventorySchema
 
-# 1. User input validator
 input_validator: TypeAdapter[Literal['y', 'yes', 'no', 'n']] = TypeAdapter[Literal['y', 'yes', 'no', 'n']]
+def get_field_validator(model_cls, field_name: str) -> TypeAdapter[Any]:
+    field_info = model_cls.model_fields[field_name]
 
-# 2. Field validators extracted safely from model fields
-name_validator = TypeAdapter(InventorySchema.model_fields['name'].annotation)
-brand_validator = TypeAdapter(InventorySchema.model_fields['brand'].annotation)
-price_each_validator = TypeAdapter(InventorySchema.model_fields['price_each'].annotation)
-type_validator = TypeAdapter(InventorySchema.model_fields['type_'].annotation)
-quantity_validator = TypeAdapter(InventorySchema.model_fields['quantity'].annotation)
+    # If the field has constraints (e.g. min_length, gt=0), combine them using Annotated
+    if field_info.metadata:
+        annotated_type = Annotated[(field_info.annotation, *field_info.metadata)]
+        return TypeAdapter(annotated_type)
 
+    # Standard type without extra constraints
+    return TypeAdapter(field_info.annotation)
+
+
+name_validator = get_field_validator(InventorySchema, 'name')
+brand_validator = get_field_validator(InventorySchema, 'brand')
+price_each_validator = get_field_validator(InventorySchema, 'price_each')
+purchase_date_validator = get_field_validator(InventorySchema, 'purchase_date')
+type_validator = get_field_validator(InventorySchema, 'type_')
+quantity_validator = get_field_validator(InventorySchema, 'quantity')
+total_price_validator = get_field_validator(InventorySchema, 'total_price')
 
 
 def prompt() -> str:
@@ -25,25 +35,31 @@ def prompt() -> str:
 
 
 def validator_func(
-    validator: TypeAdapter[Any],
-    message: str,
-    cast_to: Optional[Callable[[str], Any]] = None
+        validator: TypeAdapter[Any],
+        message: str,
+        cast_to: Optional[Callable[[str], Any]] = None
 ) -> Any:
-    try:
+    while True:
+        # Flush stdout so error messages print BEFORE input() pauses execution
         raw_input: str = input(message).strip()
 
-        # Explicitly cast input types (e.g., string to integer for price)
-        parsed_input: Any = cast_to(raw_input) if cast_to else raw_input
+        try:
+            # 1. Apply explicit casting if specified
+            if cast_to:
+                parsed_input = cast_to(raw_input)
+            else:
+                parsed_input = raw_input
 
-        return validator.validate_python(parsed_input)
-    except (ValidationError, ValueError) as ex:
-        # Gracefully extract the precise failure reason text from Pydantic
-        if isinstance(ex, ValidationError):
-            print(f"❌ Input Error: {ex.errors()[0]['msg']}")
-        else:
-            print("❌ Input Error: Must be a valid numeric whole number.")
+            # 2. Validate using Pydantic (automatically handles string-to-type parsing)
+            return validator.validate_python(parsed_input)
 
-        return validator_func(validator, message, cast_to)
+        except ValidationError as ex:
+            # Extract precise failure message from Pydantic
+            print(f"❌ Input Error: {ex.errors()[0]['msg']}", flush=True)
+
+        except (ValueError, TypeError):
+            print("❌ Input Error: Invalid value format.", flush=True)
+
 
 
 def schema_validator() -> Tuple[str, Optional[str], Optional[str], int, int, str, int]:
