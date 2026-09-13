@@ -61,12 +61,3 @@ class Drawer(BaseModel):
 
         self._balance -= clean_value
         self._cash_flow_logs.append((-clean_value, self.time))
-
-
-
-d = Drawer()
-d.balance_negator = 650
-d.balance_adder = 900
-d.balance_negator = 1000
-print(f"Current Balance: {d.balance}")
-print(f"Cash Flow Logs: {d.cash_flow_logs}")

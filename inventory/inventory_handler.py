@@ -18,16 +18,23 @@ def prompt_addition() -> bool:
     if choice in ['yes', 'y']:
         name, brand, type_, price_each, quantity, date_time, total_price = schema_validator()
         print("\n📦 Created Object Blueprint:\n", name, brand, type_, price_each, quantity, date_time, total_price)
-        inventory_manager.to_db(name, brand, type_, price_each, quantity, date_time, total_price)
-        #drawer.balance -= total_price
-        print('✨ Addition To DB Successful!\n')
-        time.sleep(1)
+        try:
+            if total_price>drawer.balance:
+                raise ValueError('Insufficient Funds')
+
+            inventory_manager.to_db(name, brand, type_, price_each, quantity, date_time, total_price)
+            drawer.balance_negator = total_price
+            print('✨ Addition To DB Successful!\n')
+        except ValueError as ex:
+            print(ex)
+        except Exception as ex:
+            print(f'unexpacted db error occored {ex}')
         return True
 
     elif choice in ['no', 'n']:
         print('Good Bye!')
         inventory_manager.watch_db(table=Inventory)
-        print(drawer.cash_flow_logs)
+        print(drawer.cash_flow_logs, drawer.balance)
         time.sleep(1)
         return False
 
@@ -42,16 +49,21 @@ def prompt_negation() -> bool:
     if choice in ['yes', 'y']:
         name, brand, type_, quantity = schema_validator_from_db()
         total_price = inventory_manager.from_db(name, brand, type_, quantity)
-        #drawer.balance += total_price
-        if total_price:
-            print(f'your total bill for item_{name} is {total_price}')
+
+        # Only process transaction if money was actually exchanged (total_price > 0)
+        if total_price and total_price > 0:
+            drawer.balance_adder = total_price
+            print(f'🛒 Your total bill for item_{name} is {total_price}')
+        else:
+            print("❌ Transaction cancelled: Item unavailable or insufficient stock.")
+
         time.sleep(1)
         return True
 
     elif choice in ['no', 'n']:
         print('Good Bye!')
         inventory_manager.watch_db(table=Inventory)
-        print(drawer.cash_flow_logs)
+        print("Final Status:", drawer.cash_flow_logs, drawer.balance)
         time.sleep(1)
         return False
 
@@ -64,6 +76,7 @@ def run_add() -> None:
     while True:
         if not prompt_addition():
             break
+
 def run_negate() -> None:
     while True:
         if not prompt_negation():
