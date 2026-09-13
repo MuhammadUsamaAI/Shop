@@ -87,23 +87,3 @@ def schema_validator_from_db() -> Tuple[str, Optional[str], Optional[str], int]:
     )
     quantity: int = validator_func(quantity_validator, f'Please enter the quantity of the items to be bought: ', cast_to=int)
     return name, brand, type_, quantity
-
-# def inventry_addititor_test() -> bool:
-#     choice: str = input("Do you want to add an item? (y/n): ").strip().lower()
-#
-#     if choice in ['yes', 'y']:
-#         name, brand, type_, price_each, quantity, date_time, total_price = schema_validator()
-#         print("\n📦 Created Object Blueprint:\n", name, brand, type_, price_each, quantity, date_time, total_price)
-#         print('✨ Addition Successful!\n')
-#         time.sleep(1)
-#         return True
-#
-#     elif choice in ['no', 'n']:
-#         print('Good Bye!')
-#         time.sleep(1)
-#         return False
-#
-#     else:
-#         print("Invalid choice. Please enter 'y' or 'n'.")
-#         return True  # Keeps the loop running on invalid input
-# schema_validator_from_db()
