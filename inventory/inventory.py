@@ -1,11 +1,7 @@
-import time
 from sqlalchemy import String, Integer, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 from typing import Optional, Type, Any
-from .inventry_producer_module import schema_validator
-from finance.drawer import Drawer
 
-drawr = Drawer()
 
 class Base(DeclarativeBase):
     pass
@@ -84,37 +80,49 @@ class InventoryManager:
                 session.commit()
                 print(f'New item = {name}, brand = {brand} added to the db')
 
+    def from_db(
+            self,
+            name: str,
+            brand: str,
+            type_: str,
+            quantity: int | str,
+    ) -> int:
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            print("❌ Error: Requested quantity must be a numeric value.")
+            return 0
+
+        with Session(self.engine) as session:
+            existing_record = session.scalars(select(Inventory).where(
+                Inventory.item == name,
+                Inventory.brand == brand,
+                Inventory.item_type == type_,
+            )).first()
+
+            if not existing_record:
+                print(f'❌ Item "{name}" does not exist in inventory.')
+                return 0
+
+            print(f'🔍 Item "{name}" exists in inventory.')
+
+            if existing_record.quantity == 0:
+                print(f'⚠️ Sorry, item "{name}" is completely out of stock.')
+                return 0
+            elif existing_record.quantity < quantity:
+                print(f'⚠️ Insufficient stock. Requested {quantity}, but only {existing_record.quantity} available.')
+                return 0
+
+            # Fulfill the order safely
+            total_bill = existing_record.price_each * quantity
+            existing_record.quantity -= quantity
+            existing_record.total_price = existing_record.price_each * existing_record.quantity
+
+            session.commit()
+            return total_bill
+
     def watch_db(self, table: Type[Any]) -> None:
         with Session(self.engine) as session:
             stmt = select(table)
             for val in session.scalars(stmt):
-                print(val)
-
-    def prompt_addition(self) -> bool:
-        choice = input("Do you want to add an item? (y/n): ").strip().lower()
-
-        if choice in ['yes', 'y']:
-            name, brand, type_, price_each, quantity, date_time, total_price = schema_validator()
-            print("\n📦 Created Object Blueprint:\n", name, brand, type_, price_each, quantity, date_time, total_price)
-            self.to_db(name, brand, type_, price_each, quantity, date_time, total_price)
-            drawr.balance+=total_price
-            print('✨ Addition To DB Successful!\n')
-            time.sleep(1)
-            return True
-
-        elif choice in ['no', 'n']:
-            print('Good Bye!')
-            self.watch_db(table=Inventory)
-            print(drawr.cash_flow_logs)
-            time.sleep(1)
-            return False
-
-        else:
-            print("Invalid choice. Please enter 'y' or 'n'.")
-            return True
-
-
-    def run(self) -> None:
-        while True:
-            if not self.prompt_addition():
-                break
+                print(val, end='\n')

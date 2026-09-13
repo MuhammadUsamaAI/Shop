@@ -1,3 +1,2 @@
-from inventory.inventory import InventoryManager
-a = InventoryManager()
-a.run()
+from inventory.inventory_handler import run_negate
+run_negate()

@@ -41,13 +41,3 @@ class Drawer(BaseModel):
                 raise ValueError("Value can only be a numeric type")
         else:
             raise TypeError("Balance must be an int or a numeric string")
-
-# d = Drawer()
-# d.balance += 50
-# d.balance += 20
-# d.balance -= 15
-# print(d.cash_flow_logs)
-# # print(repr(d))
-# # print(d.time)
-# # time.sleep(1)
-# # print(d.time)

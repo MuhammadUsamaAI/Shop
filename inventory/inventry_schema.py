@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Literal, Union, Optional
+from typing import Literal, Optional
 from helper_functions import current_date_time
 
 # Use a Tuple directly with Literal[*...] via TypeAlias / unpacking (Python 3.11+)
