@@ -1,10 +1,10 @@
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, PrivateAttr, Field
 from helper_functions import current_date_time
 from typing import List, Tuple
 
 
 class Drawer(BaseModel):
-    _balance: int = PrivateAttr(default=10000)
+    _balance: int = PrivateAttr(default=10000, init=True)
     _time: str = PrivateAttr(default=current_date_time())
     _cash_flow_logs: List[Tuple[int, str]] = PrivateAttr(default_factory=list)
 

@@ -4,8 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column, Session, DeclarativeBase
 from helper_functions import current_date_time, main_path, path_corretor
 
 
-abs_path = path_corretor('finance', main_path(), 'shop_database.db')
-print(abs_path)
+# abs_path = path_corretor('finance', main_path(), 'shop_database.db')
+# print(abs_path)
 
 class Base(DeclarativeBase):
     pass
@@ -85,6 +85,13 @@ class FinanceDBHandler:
             else:
                 print('no table exists')
 
+    def last_balance(self)->int|None:
+        with Session(self.engine) as session:
+            existing_record = self.last_row(session)
+            if existing_record:
+                return existing_record.balance
+            else:
+                print('No records found')
     def watch_db(self):
         with Session(self.engine) as session:
             stmt = select(Balance_Sheet)
@@ -92,12 +99,12 @@ class FinanceDBHandler:
                 print(val)
 
 
-f = FinanceDBHandler()
-f.negate_balance(amount=200)
-f.add_to_db(amount=600)
-f.add_to_db(amount=400)
-f.negate_balance(amount=500)
-f.negate_balance(amount=300)
-print(f.watch_db())
+# f = FinanceDBHandler()
+# f.negate_balance(amount=200)
+# f.add_to_db(amount=600)
+# f.add_to_db(amount=400)
+# f.negate_balance(amount=500)
+# f.negate_balance(amount=300)
+# print(f.watch_db())
 
 

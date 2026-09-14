@@ -14,11 +14,23 @@ def main_path() -> str:
 
 
 def path_corretor(
-    key_to_remove: str, path: str | PathLike[str], key_to_add: str
+    path: str | PathLike[str],
+    key_to_remove: str | None = None,
+    key_to_add: str | None = None,
 ) -> str:
-    path_str = str(path)
-    if key_to_remove in path_str:
-        path_str = path_str.replace(
-            "finance", ""
-        )
-    return os.path.join(path_str, key_to_add)
+  path_str = str(path)
+
+  if key_to_remove:
+    # Normalize removes trailing slashes so os.path.split isolates the true last folder
+    path_str = os.path.normpath(path_str)
+    head, tail = os.path.split(path_str)
+
+    if tail == key_to_remove:
+      path_str = head
+    else:
+      raise ValueError(f"Path does not end with '{key_to_remove}'")
+
+  if key_to_add:
+    path_str = os.path.join(path_str, key_to_add)
+
+  return path_str

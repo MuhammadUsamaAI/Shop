@@ -121,7 +121,7 @@ class InventoryManager:
             session.commit()
             return total_bill
 
-    def watch_db(self, table: Type[Any]) -> None:
+    def watch_db(self, table: Type[Any]= Inventory) -> None:
         with Session(self.engine) as session:
             stmt = select(table)
             for val in session.scalars(stmt):

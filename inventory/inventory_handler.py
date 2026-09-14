@@ -1,7 +1,7 @@
 import time
 from helper_functions import main_path
 from .inventry_producer_module import schema_validator, schema_validator_from_db
-from .inventory import Inventory, InventoryManager
+from .inventory import InventoryManager
 from finance.drawer import Drawer
 import os
 
@@ -33,7 +33,7 @@ def prompt_addition() -> bool:
 
     elif choice in ['no', 'n']:
         print('Good Bye!')
-        inventory_manager.watch_db(table=Inventory)
+        inventory_manager.watch_db()
         print(drawer.cash_flow_logs, drawer.balance)
         time.sleep(1)
         return False
@@ -62,7 +62,7 @@ def prompt_negation() -> bool:
 
     elif choice in ['no', 'n']:
         print('Good Bye!')
-        inventory_manager.watch_db(table=Inventory)
+        inventory_manager.watch_db()
         print("Final Status:", drawer.cash_flow_logs, drawer.balance)
         time.sleep(1)
         return False
