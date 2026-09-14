@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import Integer, String, create_engine, select
+from sqlalchemy import Integer, String, create_engine, select, inspect
 from sqlalchemy.orm import Mapped, mapped_column, Session, DeclarativeBase
 from helper_functions import current_date_time, main_path, path_corretor
 
@@ -7,10 +7,10 @@ from helper_functions import current_date_time, main_path, path_corretor
 # abs_path = path_corretor('finance', main_path(), 'shop_database.db')
 # print(abs_path)
 
-class Base(DeclarativeBase):
+class FinanceBase(DeclarativeBase):
     pass
 
-class Balance_Sheet(Base):
+class Balance_Sheet(FinanceBase):
     __tablename__ = 'balance_sheet'
 
     id:Mapped['int'] = mapped_column(primary_key=True)
@@ -27,7 +27,7 @@ class Balance_Sheet(Base):
 class FinanceDBHandler:
     def __init__(self, db_url:str = "sqlite://"):
         self.engine = create_engine(db_url, echo=False)
-        Base.metadata.create_all(self.engine)
+        FinanceBase.metadata.create_all(self.engine)
 
     def last_row(self, session:Session)->Balance_Sheet|None:
         smt = select(Balance_Sheet).order_by(Balance_Sheet.id.desc()).limit(1)
@@ -85,18 +85,36 @@ class FinanceDBHandler:
             else:
                 print('no table exists')
 
-    def last_balance(self)->int|None:
+    def last_balance(self) -> int:
         with Session(self.engine) as session:
             existing_record = self.last_row(session)
             if existing_record:
                 return existing_record.balance
             else:
-                print('No records found')
+                return 5000  # Sets safe default starting funds if database is completely new
+
     def watch_db(self):
         with Session(self.engine) as session:
-            stmt = select(Balance_Sheet)
-            for val in session.scalars(stmt):
-                print(val)
+            if self.last_row(session):
+                stmt = select(Balance_Sheet)
+                for val in session.scalars(stmt):
+                    print(val)
+            else:
+                print('empty db')
+
+    def reset_db(self):
+        inspector = inspect(self.engine)
+
+        if inspector.has_table('balance_sheet'):
+            print(f'Table Exists! {inspector.get_table_names()} Dropping the table now')
+            Balance_Sheet.__table__.drop(bind=self.engine)
+            print('Dropped Successfully')
+            FinanceBase.metadata.create_all(bind=self.engine, tables=[Balance_Sheet.__table__])
+
+        else:
+            print('No Table Exists')
+
+
 
 
 # f = FinanceDBHandler()

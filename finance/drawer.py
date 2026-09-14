@@ -4,12 +4,12 @@ from typing import List, Tuple
 
 
 class Drawer(BaseModel):
-    _balance: int = PrivateAttr(default=10000, init=True)
+    balance_: int = Field(default=5000)
     _time: str = PrivateAttr(default=current_date_time())
     _cash_flow_logs: List[Tuple[int, str]] = PrivateAttr(default_factory=list)
 
     def __repr__(self):
-        return f'({self._balance}, {self._time})'
+        return f'({self.balance_}, {self._time})'
 
     @property
     def cash_flow_logs(self):
@@ -22,7 +22,7 @@ class Drawer(BaseModel):
 
     @property
     def balance(self) -> int:
-        return self._balance
+        return self.balance_
 
     def _parse_and_validate_value(self, value: int | str) -> int:
         if isinstance(value, str):
@@ -39,25 +39,25 @@ class Drawer(BaseModel):
 
     @property
     def balance_adder(self) -> int:
-        return self._balance
+        return self.balance_
 
     @balance_adder.setter
     def balance_adder(self, value: int | str):
         clean_value = self._parse_and_validate_value(value)
 
-        self._balance += clean_value
+        self.balance_ += clean_value
         self._cash_flow_logs.append((clean_value, self.time))
 
     @property
     def balance_negator(self) -> int:
-        return self._balance
+        return self.balance_
 
     @balance_negator.setter
     def balance_negator(self, value: int | str):
         clean_value = self._parse_and_validate_value(value)
 
-        if clean_value > self._balance:
+        if clean_value > self.balance_:
             raise ValueError("Insufficient Funds in Accounts")
 
-        self._balance -= clean_value
+        self.balance_ -= clean_value
         self._cash_flow_logs.append((-clean_value, self.time))

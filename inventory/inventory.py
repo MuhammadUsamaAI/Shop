@@ -1,12 +1,12 @@
-from sqlalchemy import String, Integer, create_engine, select
+from sqlalchemy import String, Integer, create_engine, select, inspect
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 from typing import Optional, Type, Any
 
 
-class Base(DeclarativeBase):
+class InventoryBase(DeclarativeBase):
     pass
 
-class Inventory(Base):
+class Inventory(InventoryBase):
     __tablename__ = 'inventory'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -30,7 +30,7 @@ class Inventory(Base):
 class InventoryManager:
     def __init__(self, db_url: str = "sqlite://") -> None:
         self.engine = create_engine(db_url, echo=False)
-        Base.metadata.create_all(self.engine)
+        InventoryBase.metadata.create_all(self.engine)
 
     def to_db(
             self,
@@ -126,3 +126,18 @@ class InventoryManager:
             stmt = select(table)
             for val in session.scalars(stmt):
                 print(val, end='\n')
+
+    def reset_db(self):
+        inspector = inspect(self.engine)
+
+        if inspector.has_table('inventory'):
+            print(f'Table Exists! {inspector.get_table_names()} Dropping the table now')
+            Inventory.__table__.drop(bind = self.engine)
+            print('Dropped Successfully')
+            InventoryBase.metadata.create_all(self.engine, tables=[Inventory.__table__])
+
+        else:
+            print('No Table Exists')
+
+
+

@@ -1,15 +1,107 @@
+import time
 from finance.drawer import Drawer
 from finance.balance_db import FinanceDBHandler
 from inventory.inventory_handler import InventoryManager
+from inventory.inventry_producer_module import schema_validator, schema_validator_from_db
 from helper_functions import main_path, path_corretor
 
 path = main_path()
 db_name = 'shop_database.db'
 abs_path_db = path_corretor(path, key_to_add=db_name)
 db_url = f"sqlite:///{abs_path_db}"
+
 inventory_manager = InventoryManager(db_url=db_url)
 finance_handler = FinanceDBHandler(db_url=db_url)
-drawer = Drawer()
 
-print(inventory_manager.watch_db())
-print(finance_handler.watch_db())
+
+def prompt_addition() -> bool:
+    choice = input("Do you want to add an item? (y/n): ").strip().lower()
+
+    if choice in ['yes', 'y']:
+        name, brand, type_, price_each, quantity, date_time, total_price = schema_validator()
+        print("\n📦 Created Object Blueprint:\n", name, brand, type_, price_each, quantity, date_time, total_price)
+
+        try:
+            # 1. Fetch current live balance from DB (Sole Source of Truth)
+            current_balance = finance_handler.last_balance()
+            print(f'Current available balance in DB: {current_balance}')
+
+            # 2. Use Drawer strictly for validating the upcoming transaction
+            validator_drawer = Drawer(balance=current_balance)
+
+            # This triggers your internal @balance_negator.setter validation check
+            validator_drawer.balance_negator = total_price
+
+            # 3. Process DB Transfers: Deduct money first, then add to inventory
+            finance_handler.negate_balance(total_price, comment=f"Purchase: {name} x{quantity}")
+            inventory_manager.to_db(name, brand, type_, price_each, quantity, date_time, total_price)
+
+            print(f'New balance in DB: {finance_handler.last_balance()}')
+            print('✨ Stock added and funds transferred successfully!\n')
+
+        except ValueError as ex:
+            print(f"❌ Transaction Denied: {ex}")
+        except Exception as ex:
+            print(f'Unexpected DB error occurred: {ex}')
+        return True
+
+    elif choice in ['no', 'n']:
+        print('Good Bye!')
+        inventory_manager.watch_db()
+        finance_handler.watch_db()
+        print(f"Final DB Balance: {finance_handler.last_balance()}")
+        time.sleep(1)
+        return False
+
+    else:
+        print("Invalid choice. Please enter 'y' or 'n'.")
+        return True
+
+
+def prompt_negation() -> bool:
+    choice = input("Do you want to buy an item? (y/n): ").strip().lower()
+
+    if choice in ['yes', 'y']:
+        name, brand, type_, quantity = schema_validator_from_db()
+
+        # 1. Check stock and reduce inventory first (returns absolute bill total if successful)
+        total_price = inventory_manager.from_db(name, brand, type_, quantity)
+
+        # 2. Only transfer funds to the finance DB if the items were successfully claimed
+        if total_price and total_price > 0:
+            finance_handler.add_to_db(total_price, comment=f"Sale: {name} x{quantity}")
+            print(f'🛒 Your total bill for item_{name} is {total_price}')
+            print(f'Updated DB Balance: {finance_handler.last_balance()}')
+        else:
+            print("❌ Transaction cancelled: Item unavailable or insufficient stock.")
+
+        time.sleep(1)
+        return True
+
+    elif choice in ['no', 'n']:
+        print('Good Bye!')
+        inventory_manager.watch_db()
+        finance_handler.watch_db()
+        print(f"Final DB Status Balance: {finance_handler.last_balance()}")
+        time.sleep(1)
+        return False
+
+    else:
+        print("Invalid choice. Please enter 'y' or 'n'.")
+        return True
+
+
+def run_add() -> None:
+    while True:
+        if not prompt_addition():
+            break
+
+
+def run_negate() -> None:
+    while True:
+        if not prompt_negation():
+            break
+
+
+inventory_manager.reset_db()
+finance_handler.reset_db()
