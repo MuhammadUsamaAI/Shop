@@ -102,6 +102,3 @@ def run_negate() -> None:
         if not prompt_negation():
             break
 
-
-inventory_manager.reset_db()
-finance_handler.reset_db()
