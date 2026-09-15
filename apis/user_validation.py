@@ -17,13 +17,17 @@ user_name = TypeAdapter(
 )
 
 
-user_literal_types = ('user', 'manager', 'User', 'Manager', 'MANAGER', 'USER')
+user_literal_types_main = ('user', 'manager', 'User', 'Manager',
+                      'MANAGER', 'USER', 'admin', 'Admin', 'ADMIN')
+user_literal_types = ('user', 'manager', 'User', 'Manager',
+                      'MANAGER', 'USER')
 user_literal_choices = ('yes', 'no', 'Yes', 'No', 'YES', 'NO')
 user_literal_add_remove = ('add', 'remove', 'ADD', 'REMOVE', 'Add', 'Remove')
 
 user_age:TypeAdapter[int] = TypeAdapter(Annotated[int, Field(ge= 18, le=99)])
+user_type_main:TypeAdapter[Literal[Tuple]] = TypeAdapter(Literal[user_literal_types_main])
 user_type:TypeAdapter[Literal[Tuple]] = TypeAdapter(Literal[user_literal_types])
-user_pin:TypeAdapter[int] = TypeAdapter(Annotated[int, Field(ge=0, lt=9999)])
+user_pin:TypeAdapter[int] = TypeAdapter(Annotated[int, Field(ge=1000, lt=9999)])
 user_choice:TypeAdapter[str] = TypeAdapter(Literal[user_literal_choices])
 user_add_remove:TypeAdapter[str] = TypeAdapter(Literal[user_literal_add_remove])
 
@@ -34,6 +38,7 @@ class UserValidation(enum.Enum):
     Pin = user_pin
     Age = user_age
     AddRmove = user_add_remove
+    Main_Type = user_type_main
 
 def validate_input_type(arg: str|int, validation_type: TypeAdapter):
     if isinstance(arg, str) and (validation_type == user_age or validation_type == user_pin):
