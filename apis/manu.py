@@ -1,11 +1,13 @@
 import time
 from user_validation import UserValidation, validation_function
+from user_db import UserDBHandler
 from typing import Tuple
 from enum import Enum
 from pydantic import TypeAdapter
 
 enter_your_string = 'please enter your '
 enter_person_string = 'please enter person'
+user_db = UserDBHandler()
 
 
 def get_login_data(name_validator: TypeAdapter | Enum = UserValidation.Name.value,
