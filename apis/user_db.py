@@ -140,7 +140,7 @@ class UserDBHandler:
                   account_type:str,
                   name:str,
                   age:int
-                  ):
+                  )->bool:
         with Session(self.engine) as session:
             account = session.scalars(select(UserDB).where(
                 UserDB.acc_type == account_type,
@@ -152,8 +152,10 @@ class UserDBHandler:
                 session.delete(account)
                 session.commit()
                 print(f'deleted {account_type}, {name}, {age}')
+                return True
             else:
                 print('Account non existent')
+                return False
 
     def watch_db(self):
         with Session(self.engine) as session:
