@@ -1,26 +1,29 @@
 import time
-from .user_validation import UserValidation, validation_function
-from .user_db import UserDBHandler
+from apis.user_db import UserDBHandler
 from typing import Tuple
-from enum import Enum
 from pydantic import TypeAdapter
 from manager import prompt_addition, prompt_negation
+
+from apis.user_validation import (user_name, user_age, user_pin, user_type_main,
+                                  user_choice_y_n, user_choice_1_2, user_menut,
+                                  user_add_remove, validation_function)
+
 ENTER_YOUR = 'please enter your '
 ENTER_PERSON = 'please enter person'
 
-#user_db = UserDBHandler()
+user_db = UserDBHandler()
 
 
-def get_login_data(name_validator: TypeAdapter | Enum = UserValidation.Name.value,
-                    pin_validator: TypeAdapter | Enum = UserValidation.Pin.value) -> Tuple[str, int]:
+def get_login_data(name_validator: TypeAdapter = user_name,
+                    pin_validator: TypeAdapter = user_pin) -> Tuple[str, int]:
     name = validation_function(name_validator, f'{ENTER_YOUR}name')
     pin = validation_function(pin_validator, f'{ENTER_YOUR}pin')
     return name, pin
 
 
-def get_create_acc_data(name_validator: TypeAdapter | Enum = UserValidation.Name.value,
-                         pin_validator: TypeAdapter | Enum = UserValidation.Pin.value,
-                         age_validator: TypeAdapter | Enum = UserValidation.Age.value) -> Tuple[str, int, int]:
+def get_create_acc_data(name_validator: TypeAdapter = user_name,
+                         pin_validator: TypeAdapter = user_pin,
+                         age_validator: TypeAdapter = user_age ) -> Tuple[str, int, int]:
     name = validation_function(name_validator, f'{ENTER_PERSON} name')
     age = validation_function(age_validator, f'{ENTER_PERSON} age ')
     pin = validation_function(pin_validator, f'{ENTER_PERSON} pin')
@@ -59,20 +62,20 @@ def admin_menu(name: str) -> None:
     print(f'hello admin:{name}\n')
     print('to add or remove an account press 1')
     print('to add or remove items from shop inventory press 2')
-    selection = validation_function(UserValidation.user_selection.value, 
+    selection = validation_function(user_choice_1_2,
                                     'please enter value')
     if selection == '1' or selection == 1:
-        action = validation_function(UserValidation.AddRmove.value,
-                                      'do you want to add or remove an account?').lower()
+        action = validation_function(user_add_remove,
+                                      'do you want to add or remove an account?')
         if action not in ('add', 'remove'):
             print('invalid choice')
             return
         verb = 'create' if action == 'add' else 'remove'
-        target_type = validation_function(UserValidation.Acc_Type.value,
-                                           f'do you want to {verb} user account or manager account?').lower()
+        target_type = validation_function(user_type_main,
+                                           f'do you want to {verb} user account or manager account?')
         handle_add_remove(action, target_type)
     elif selection == '2' or selection == 2:
-        action = validation_function(UserValidation.inventory_choice.value, 'do you want to buy or sell inventory').lower()
+        action = validation_function(user_menut, 'do you want to buy or sell inventory')
         if action == 'buy':
             prompt_addition()
         elif action == 'sell':
@@ -85,18 +88,18 @@ def manager_menu(name: str) -> None:
     print(f'hello manager: {name}\n')
     print('to add or remove an account press 1')
     print('to add or remove items from shop inventory press 2')
-    selection = validation_function(UserValidation.user_selection.value,
+    selection = validation_function(user_choice_1_2,
                                     'please enter value')
     if selection == '1' or selection == 1:
-        action = validation_function(UserValidation.AddRmove.value,
-                                      'do you want to add or remove user account?').lower()
+        action = validation_function(user_add_remove,
+                                      'do you want to add or remove user account?')
         if action == 'add':
             add_account('user')
         elif action == 'remove':
             remove_account('user')
 
     elif selection == '2' or selection == 2:
-        action = validation_function(UserValidation.inventory_choice.value, 'do you want to buy or sell inventory').lower()
+        action = validation_function(user_menut, 'do you want to buy or sell inventory')
         if action == 'buy':
             prompt_addition()
         elif action == 'sell':
@@ -109,38 +112,3 @@ def user_menu(name:str)->None:
     print(f'hello manager: {name}\n')
     prompt_negation()
 
-
-# def menu() -> bool:
-#     print('Welcome to the Automated Shop\n')
-#     acc_type = validation_function(UserValidation.Main_Type.value, 'Select account type').lower()
-#
-#     if acc_type == 'admin':
-#         print('Welcome to the Administrator Manu\n')
-#         name, pin = get_login_data()
-#         if user_db.logged(account_type=acc_type, name=name, pin=pin):
-#             admin_menu(name)
-#         return True
-#
-#     elif acc_type == 'manager':
-#         print('Welcome to the Managerial Manu\n')
-#         name, pin = get_login_data()
-#         if user_db.logged(account_type=acc_type, name=name, pin=pin):
-#             manager_menu(name)
-#         return True
-#
-#     elif acc_type == 'user':
-#         print('Welcom to the User Manu\n')
-#         name, pin = get_login_data()
-#         if user_db.logged(account_type=acc_type, name=name, pin=pin):
-#             print(f'hi {acc_type}:{name}')
-#         return True
-#
-#     else:
-#         print('unspecified account type')
-#         return True
-
-
-# while True:
-#     if menu() is False:
-#         print("Exiting application...")
-#         break

@@ -1,12 +1,13 @@
-from apis.user_validation import validation_function, UserValidation
 from apis.user_menu import get_login_data, admin_menu, manager_menu
 from apis.user_db import UserDBHandler
+from apis.user_validation import user_type_main, validation_function
+
 user_db = UserDBHandler()
 
 
 def menu() -> bool:
     print('Welcome to the Automated Shop\n')
-    acc_type = validation_function(UserValidation.Main_Type.value, 'Select account type').lower()
+    acc_type = validation_function(user_type_main, 'Select account type')
 
     if acc_type == 'admin':
         print('Welcome to the Administrator Manu\n')

@@ -1,7 +1,10 @@
 from pydantic import TypeAdapter, StringConstraints, Field, ValidationError
-from typing_extensions import Annotated, Literal
-from typing import Callable, Any, Tuple
-import enum
+from typing_extensions import Annotated
+from typing import Callable, Any
+from .user_enums import UserOpts12, UserOptsYN, UserOptsAddRemove, UserTypesAdmin, UserMenu
+
+
+
 
 user_name = TypeAdapter(
     Annotated[
@@ -15,45 +18,23 @@ user_name = TypeAdapter(
         )
     ]
 )
-
-
-user_literal_types_main = ('user', 'manager', 'User', 'Manager',
-                      'MANAGER', 'USER', 'admin', 'Admin', 'ADMIN')
-user_literal_types = ('user', 'manager', 'User', 'Manager',
-                      'MANAGER', 'USER')
-user_literal_choices = ('yes', 'no', 'Yes', 'No', 'YES', 'NO')
-user_literal_add_remove = ('add', 'remove', 'ADD', 'REMOVE', 'Add', 'Remove')
-user_literal_choice_1_2 = ('1', 1, '2', 2)
-user_literal_db_choices = ('buy', 'sell', 'Buy', 'sell', 'BUY', 'SELL')
-
-user_age:TypeAdapter[int] = TypeAdapter(Annotated[int, Field(ge= 18, le=99)])
-user_type_main:TypeAdapter[Literal[Tuple]] = TypeAdapter(Literal[user_literal_types_main])
-user_type:TypeAdapter[Literal[Tuple]] = TypeAdapter(Literal[user_literal_types])
-user_pin:TypeAdapter[int] = TypeAdapter(Annotated[int, Field(ge=1000, lt=9999)])
-user_choice:TypeAdapter[str] = TypeAdapter(Literal[user_literal_choices])
-user_add_remove:TypeAdapter[str] = TypeAdapter(Literal[user_literal_add_remove])
-user_choice_1_2:TypeAdapter[int|str] = TypeAdapter(Literal[user_literal_choice_1_2])
-user_inventory_choice:TypeAdapter[str, str, str, str, str, str] = TypeAdapter(Literal[user_literal_db_choices])
-
-
-class UserValidation(enum.Enum):
-    Name = user_name
-    Acc_Type = user_type
-    Choice = user_choice
-    Pin = user_pin
-    Age = user_age
-    AddRmove = user_add_remove
-    Main_Type = user_type_main
-    user_selection = user_choice_1_2
-    inventory_choice = user_inventory_choice
+user_age:TypeAdapter= TypeAdapter(Annotated[int, Field(ge= 18, le=99)])
+user_type_main:TypeAdapter = TypeAdapter(UserTypesAdmin)
+user_pin:TypeAdapter= TypeAdapter(Annotated[int, Field(ge=1000, lt=9999)])
+user_choice_y_n:TypeAdapter = TypeAdapter(UserOptsYN)
+user_add_remove:TypeAdapter= TypeAdapter(UserOptsAddRemove)
+user_choice_1_2:TypeAdapter = TypeAdapter(UserOpts12)
+user_menut = TypeAdapter(UserMenu)
 
 
 def validate_input_type(arg: str|int, validation_type: TypeAdapter):
     if isinstance(arg, str) and (validation_type == user_age or validation_type == user_pin):
         return int(arg)
-    elif not isinstance(arg, str) and (validation_type == user_name or validation_type == user_type
-                                  or validation_type == user_choice):
-        raise ValueError('string types only')
+    elif isinstance(arg, int) and (validation_type == user_choice_1_2):
+        return str(arg)
+    elif not isinstance(arg, str) and (validation_type == user_name or validation_type == user_type_main
+                                  or validation_type == user_choice_y_n or validation_type == user_menut):
+        raise ValueError('Must be valid string')
     else:
         return arg
 
@@ -74,3 +55,6 @@ def validation_function(validation_type:TypeAdapter|Any,
             print(ex)
         except Exception as ex:
             print(ex)
+
+
+validation_function(user_type_main, 'please enter user_type')
