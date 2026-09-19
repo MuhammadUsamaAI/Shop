@@ -57,4 +57,4 @@ def validation_function(validation_type:TypeAdapter|Any,
             print(ex)
 
 
-validation_function(user_type_main, 'please enter user_type')
+# validation_function(user_type_main, 'please enter user_type')

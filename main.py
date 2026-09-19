@@ -24,7 +24,7 @@ def menu() -> bool:
         return True
 
     elif acc_type == 'user':
-        print('Welcom to the User Manu\n')
+        print('Welcome to the User Manu\n')
         name, pin = get_login_data()
         if user_db.logged(account_type=acc_type, name=name, pin=pin):
             print(f'hi {acc_type}:{name}')
@@ -32,7 +32,7 @@ def menu() -> bool:
 
     else:
         print('unspecified account type')
-        return True
+        return False
 
 
 while True:
