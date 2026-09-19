@@ -3,6 +3,7 @@ import time
 from typing import Tuple
 from pydantic import TypeAdapter
 from manager import prompt_addition, prompt_negation, prompt_view
+from apis.user_db import UserDBHandler
 
 from apis.user_validation import (user_name, user_age, user_pin, user_type_main,
                                   user_choice_1_4, user_menu_validator,
@@ -30,7 +31,7 @@ def get_create_acc_data(name_validator: TypeAdapter = user_name,
     return name, age, pin
 
 
-def add_account(target_type: str, database) -> None:
+def add_account(target_type: str, database:UserDBHandler) -> None:
     """Collect a person's details and add them to the DB as 'user' or 'manager'."""
     print(f"please enter the person's details below to add in {target_type}s\n")
     name, age, pin = get_create_acc_data()
@@ -39,7 +40,7 @@ def add_account(target_type: str, database) -> None:
     time.sleep(2)
 
 
-def remove_account(target_type: str, database) -> None:
+def remove_account(target_type: str, database:UserDBHandler) -> None:
     """Collect a person's details and remove them from the DB as 'user' or 'manager'."""
     print(f"please enter the {target_type}'s details below to remove\n")
     name, age, pin = get_create_acc_data()
@@ -48,7 +49,7 @@ def remove_account(target_type: str, database) -> None:
         time.sleep(2)
 
 
-def handle_add_remove(action: str, target_type: str, database) -> None:
+def handle_add_remove(action: str, target_type: str, database:UserDBHandler) -> None:
     if target_type == 'admin':
         print('admin account cannot be created' if action == 'add' else "cant remove admin account")
     elif target_type in ('user', 'manager'):
@@ -57,7 +58,7 @@ def handle_add_remove(action: str, target_type: str, database) -> None:
         print('invalid choice')
 
 
-def add_remove_user(database):
+def add_remove_user(database:UserDBHandler):
     action = validation_function(user_add_remove,
                                  'do you want to add or remove user account?')
     if action == 'add':
@@ -66,7 +67,7 @@ def add_remove_user(database):
         remove_account('user', database)
 
 
-def add_remove_user_manager(database):
+def add_remove_user_manager(database:UserDBHandler):
     action = validation_function(user_add_remove,
                                  'do you want to add or remove an account?')
 
@@ -105,7 +106,7 @@ def shop_user_menu():
             return False
 
 
-def admin_manager_menu(acc_type:str, name: str, database) -> bool:
+def admin_manager_menu(acc_type:str, name: str, database:UserDBHandler) -> bool:
     while True:
         print(f'hello manager: {name}\n')
         print('For Adding or Removing an account press 1')

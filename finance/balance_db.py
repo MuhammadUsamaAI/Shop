@@ -1,11 +1,8 @@
 from typing import Optional
 from sqlalchemy import Integer, String, create_engine, select, inspect
 from sqlalchemy.orm import Mapped, mapped_column, Session, DeclarativeBase
-from helper_functions import current_date_time, main_path, path_corretor
+from helper_functions import current_date_time
 
-
-# abs_path = path_corretor('finance', main_path(), 'shop_database.db')
-# print(abs_path)
 
 class FinanceBase(DeclarativeBase):
     pass
@@ -114,15 +111,5 @@ class FinanceDBHandler:
         else:
             print('No Table Exists')
 
-
-
-
-# f = FinanceDBHandler()
-# f.negate_balance(amount=200)
-# f.add_to_db(amount=600)
-# f.add_to_db(amount=400)
-# f.negate_balance(amount=500)
-# f.negate_balance(amount=300)
-# print(f.watch_db())
 
 
