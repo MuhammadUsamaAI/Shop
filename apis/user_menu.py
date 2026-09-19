@@ -11,7 +11,7 @@ from apis.user_validation import (user_name, user_age, user_pin, user_type_main,
 ENTER_YOUR = 'please enter your '
 ENTER_PERSON = 'please enter person'
 
-user_db = UserDBHandler()
+# user_db = UserDBHandler()
 
 
 def get_login_data(name_validator: TypeAdapter = user_name,
@@ -30,30 +30,30 @@ def get_create_acc_data(name_validator: TypeAdapter = user_name,
     return name, age, pin
 
 
-def add_account(target_type: str) -> None:
+def add_account(target_type: str, database) -> None:
     """Collect a person's details and add them to the DB as 'user' or 'manager'."""
     print(f"please enter the person's details below to add in {target_type}s\n")
     name, age, pin = get_create_acc_data()
-    user_db.add_to_db(account_type=target_type, name=name, age=age, pin=pin)
+    database.add_to_db(account_type=target_type, name=name, age=age, pin=pin)
     print(f'\nPerson {name} is added to the database as {target_type.capitalize()}')
     time.sleep(2)
 
 
-def remove_account(target_type: str) -> None:
+def remove_account(target_type: str, database) -> None:
     """Collect a person's details and remove them from the DB as 'user' or 'manager'."""
     print(f"please enter the {target_type}'s details below to remove\n")
     name, age, pin = get_create_acc_data()
-    if user_db.remove_id(account_type=target_type, name=name, age=age):
+    if database.remove_id(account_type=target_type, name=name, age=age):
         print(f'\nPerson {name} is removed from the database')
         time.sleep(2)
 
 
-def handle_add_remove(action: str, target_type: str) -> None:
+def handle_add_remove(action: str, target_type: str, database) -> None:
     """Route to add_account/remove_account, handling the 'admin' special case."""
     if target_type == 'admin':
         print('admin account cannot be created' if action == 'add' else "cant remove admin account")
     elif target_type in ('user', 'manager'):
-        (add_account if action == 'add' else remove_account)(target_type)
+        (add_account if action == 'add' else remove_account)(target_type, database)
     else:
         print('invalid choice')
 
@@ -87,7 +87,7 @@ def shop_user_menu():
             return False
 
 
-def admin_menu(name: str) -> bool:
+def admin_menu(name: str, database) -> bool:
     while True:
         print(f'hello admin:{name}\n')
         print('For Adding or Removing an account press 1')
@@ -103,7 +103,7 @@ def admin_menu(name: str) -> bool:
             verb = 'create' if action == 'add' else 'remove'
             target_type = validation_function(user_type_main,
                                                f'do you want to {verb} user account or manager account?')
-            handle_add_remove(action, target_type)
+            handle_add_remove(action, target_type, database)
 
         elif selection == '2' or selection == 2:
             should_continue = shop_menu()
@@ -117,7 +117,7 @@ def admin_menu(name: str) -> bool:
             return False
 
 
-def manager_menu(name: str) -> bool:
+def manager_menu(name: str, database) -> bool:
     while True:
         print(f'hello manager: {name}\n')
         print('For Adding or Removing an account press 1')
@@ -130,9 +130,9 @@ def manager_menu(name: str) -> bool:
             action = validation_function(user_add_remove,
                                           'do you want to add or remove user account?')
             if action == 'add':
-                add_account('user')
+                add_account('user', database)
             elif action == 'remove':
-                remove_account('user')
+                remove_account('user', database)
 
         elif selection == '2' or selection == 2:
             should_continue = shop_menu()
