@@ -1,7 +1,7 @@
 from pydantic import TypeAdapter, StringConstraints, Field, ValidationError
 from typing_extensions import Annotated
 from typing import Callable, Any
-from .user_enums import UserOpts12, UserOptsYN, UserOptsAddRemove, UserTypesAdmin, UserMenu
+from .user_enums import UserOpts1to4, UserOptsYN, UserOptsAddRemove, UserTypesAdmin, UserMenu
 
 
 
@@ -23,17 +23,17 @@ user_type_main:TypeAdapter = TypeAdapter(UserTypesAdmin)
 user_pin:TypeAdapter= TypeAdapter(Annotated[int, Field(ge=1000, lt=9999)])
 user_choice_y_n:TypeAdapter = TypeAdapter(UserOptsYN)
 user_add_remove:TypeAdapter= TypeAdapter(UserOptsAddRemove)
-user_choice_1_2:TypeAdapter = TypeAdapter(UserOpts12)
-user_menut = TypeAdapter(UserMenu)
+user_choice_1_4:TypeAdapter = TypeAdapter(UserOpts1to4)
+user_menu_validator = TypeAdapter(UserMenu)
 
 
 def validate_input_type(arg: str|int, validation_type: TypeAdapter):
     if isinstance(arg, str) and (validation_type == user_age or validation_type == user_pin):
         return int(arg)
-    elif isinstance(arg, int) and (validation_type == user_choice_1_2):
+    elif isinstance(arg, int) and (validation_type == user_choice_1_4):
         return str(arg)
     elif not isinstance(arg, str) and (validation_type == user_name or validation_type == user_type_main
-                                  or validation_type == user_choice_y_n or validation_type == user_menut):
+                                  or validation_type == user_choice_y_n or validation_type == user_menu_validator):
         raise ValueError('Must be valid string')
     else:
         return arg

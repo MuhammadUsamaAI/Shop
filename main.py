@@ -1,4 +1,4 @@
-from apis.user_menu import get_login_data, admin_menu, manager_menu, user_menu
+from apis.user_menu import get_login_data, user_menu, admin_manager_menu
 from apis.user_db import UserDBHandler
 from apis.user_validation import user_type_main, validation_function
 from helper_functions import main_path, path_corretor
@@ -18,14 +18,14 @@ def menu() -> bool:
         print('Welcome to the Administrator Manu\n')
         name, pin = get_login_data()
         if user_db.logged(account_type=acc_type, name=name, pin=pin):
-            admin_menu(name, user_db)
+            admin_manager_menu(acc_type, name, user_db)
         return True
 
     elif acc_type == 'manager':
         print('Welcome to the Managerial Manu\n')
         name, pin = get_login_data()
         if user_db.logged(account_type=acc_type, name=name, pin=pin):
-            manager_menu(name, user_db)
+            admin_manager_menu(acc_type, name, user_db)
         return True
 
     elif acc_type == 'user':

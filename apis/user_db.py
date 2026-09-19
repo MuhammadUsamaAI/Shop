@@ -1,20 +1,10 @@
-import time
 from helper_functions import current_date_time
 from sqlalchemy import (create_engine, String, Integer,
                         select, Enum, CheckConstraint,
                         DDL, event
                         )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
-import enum
-
-
-class UserTypesLiteral(str ,enum.Enum):
-    admin = "admin"
-    manager = "manager"
-    user = "user"
-
-    def __str__(self):
-        return self.value
+from apis.user_enums import UserTypesAdmin
 
 
 class UserBase(DeclarativeBase):
@@ -25,9 +15,9 @@ class UserDB(UserBase):
     __tablename__ = 'user_database'
 
     id:Mapped[int] = mapped_column(primary_key=True)
-    acc_type:Mapped[UserTypesLiteral] = mapped_column(
+    acc_type:Mapped[UserTypesAdmin] = mapped_column(
         Enum(
-            UserTypesLiteral,
+            UserTypesAdmin,
             name = 'user_types_enum',
             values_callable = lambda x: [e.value for e in x]
 
@@ -81,12 +71,12 @@ class UserDBHandler:
         UserBase.metadata.create_all(self.engine)
         with Session(self.engine) as session:
             has_admin = session.scalars(select(UserDB).where(
-                UserDB.acc_type == UserTypesLiteral.admin
+                UserDB.acc_type == UserTypesAdmin.ADMIN
             )).first()
             if not has_admin:
                 session.add(
                     UserDB(
-                        acc_type=UserTypesLiteral.admin,
+                        acc_type=UserTypesAdmin.ADMIN,
                         name='usama',
                         age=29,
                         pin=1234,
@@ -163,15 +153,3 @@ class UserDBHandler:
             for val in session.scalars(stmt):
                 print(val)
 
-
-# user = UserDBHandler()
-# user.to_db(account_type='manager', name='Falak', age=31, pin = 1234)
-# time.sleep(3)
-# user.logged(name='usama', account_type='admin', pin = 1234)
-# user.watch_db()
-# time.sleep(3)
-# user.logged(name='usama', account_type='admin', pin = 1234)
-# user.logged(name='Falak', account_type='manager', pin = 1234)
-# user.watch_db()
-# user.remove_id(name='usama', age=29, account_type='admin')
-# user.watch_db()

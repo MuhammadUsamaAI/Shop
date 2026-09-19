@@ -32,7 +32,7 @@ class UserOptsYN(UserEnum):
     NO = 'no'
 
 
-class UserOpts12(UserEnum):
+class UserOpts1to4(UserEnum):
     ONE = '1'
     TWO = '2'
     THREE = '3'
