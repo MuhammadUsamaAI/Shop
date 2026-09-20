@@ -1,9 +1,7 @@
 from pydantic import TypeAdapter, StringConstraints, Field, ValidationError
 from typing_extensions import Annotated
 from typing import Callable, Any
-from .user_enums import UserOpts1to4, UserOptsYN, UserOptsAddRemove, UserTypesAdmin, UserMenu
-
-
+from src.apis.user_enums import UserOpts1to4, UserOptsYN, UserOptsAddRemove, UserTypesAdmin, UserMenu
 
 
 user_name = TypeAdapter(
@@ -55,6 +53,3 @@ def validation_function(validation_type:TypeAdapter|Any,
             print(ex)
         except Exception as ex:
             print(ex)
-
-
-# validation_function(user_type_main, 'please enter user_type')

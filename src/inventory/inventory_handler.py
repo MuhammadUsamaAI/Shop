@@ -1,8 +1,8 @@
 import time
-from helper_functions import main_path
-from .inventry_producer_module import schema_validator, schema_validator_from_db
-from .inventory import InventoryManager
-from finance.drawer import Drawer
+from src.helper_functions import main_path
+from src.inventory.inventry_producer_module import schema_validator, schema_validator_from_db
+from src.inventory.inventory import InventoryManager
+from src.finance.drawer import Drawer
 import os
 
 
@@ -11,6 +11,7 @@ drawer = Drawer()
 db_name = 'shop_database.db'
 abs_path = os.path.join(file_path, db_name)
 inventory_manager = InventoryManager(db_url = f"sqlite:///{abs_path}")
+
 
 def prompt_addition() -> bool:
     choice = input("Do you want to add an item? (y/n): ").strip().lower()
@@ -76,6 +77,7 @@ def run_add() -> None:
     while True:
         if not prompt_addition():
             break
+
 
 def run_negate() -> None:
     while True:

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, PrivateAttr, Field
-from helper_functions import current_date_time
+from src.helper_functions import current_date_time
 from typing import List, Tuple
 
 

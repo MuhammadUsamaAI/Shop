@@ -1,9 +1,9 @@
 import time
-from finance.drawer import Drawer
-from finance.balance_db import FinanceDBHandler
-from inventory.inventory_handler import InventoryManager
-from inventory.inventry_producer_module import schema_validator, schema_validator_from_db
-from helper_functions import main_path, path_corretor
+from src.finance.drawer import Drawer
+from src.finance.balance_db import FinanceDBHandler
+from src.inventory.inventory_handler import InventoryManager
+from src.inventory.inventry_producer_module import schema_validator, schema_validator_from_db
+from src.helper_functions import main_path, path_corretor
 
 path = main_path()
 db_name = 'shop_database.db'

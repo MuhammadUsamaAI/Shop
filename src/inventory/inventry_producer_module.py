@@ -1,9 +1,10 @@
-import time
 from pydantic import TypeAdapter, ValidationError
 from typing import Any, Callable, Optional, Literal, Tuple, Annotated
-from .inventry_schema import InventorySchema
+from src.inventory.inventry_schema import InventorySchema
 
 input_validator: TypeAdapter[Literal['y', 'yes', 'no', 'n']] = TypeAdapter[Literal['y', 'yes', 'no', 'n']]
+
+
 def get_field_validator(model_cls, field_name: str) -> TypeAdapter[Any]:
     field_info = model_cls.model_fields[field_name]
 
@@ -59,7 +60,6 @@ def validator_func(
 
         except (ValueError, TypeError):
             print("❌ Input Error: Invalid value format.", flush=True)
-
 
 
 def schema_validator() -> Tuple[str, Optional[str], Optional[str], int, int, str, int]:

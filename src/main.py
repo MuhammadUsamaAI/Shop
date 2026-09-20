@@ -1,7 +1,7 @@
-from apis.user_menu import get_login_data, user_menu, admin_manager_menu
-from apis.user_db import UserDBHandler
-from apis.user_validation import user_type_main, validation_function
-from helper_functions import main_path, path_corretor
+from src.apis.user_menu import get_login_data, user_menu, admin_manager_menu
+from src.apis.user_db import UserDBHandler
+from src.apis.user_validation import user_type_main, validation_function
+from src.helper_functions import main_path, path_corretor
 
 path = main_path()
 db_name = 'shop_database.db'

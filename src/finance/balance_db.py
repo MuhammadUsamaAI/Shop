@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy import Integer, String, create_engine, select, inspect
 from sqlalchemy.orm import Mapped, mapped_column, Session, DeclarativeBase
-from helper_functions import current_date_time
+from src.helper_functions import current_date_time
 
 
 class FinanceBase(DeclarativeBase):

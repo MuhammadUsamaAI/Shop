@@ -1,10 +1,10 @@
-from helper_functions import current_date_time
+from src.helper_functions import current_date_time
 from sqlalchemy import (create_engine, String, Integer,
                         select, Enum, CheckConstraint,
                         DDL, event
                         )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
-from apis.user_enums import UserTypesAdmin
+from src.apis.user_enums import UserTypesAdmin
 
 
 class UserBase(DeclarativeBase):

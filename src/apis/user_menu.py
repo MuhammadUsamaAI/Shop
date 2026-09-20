@@ -1,11 +1,11 @@
 import time
-#from apis.user_db import UserDBHandler
+#from src.apis.user_db import UserDBHandler
 from typing import Tuple
 from pydantic import TypeAdapter
-from manager import prompt_addition, prompt_negation, prompt_view
-from apis.user_db import UserDBHandler
+from src.manager import prompt_addition, prompt_negation, prompt_view
+from src.apis.user_db import UserDBHandler
 
-from apis.user_validation import (user_name, user_age, user_pin, user_type_main,
+from src.apis.user_validation import (user_name, user_age, user_pin, user_type_main,
                                   user_choice_1_4, user_menu_validator,
                                   user_add_remove, validation_function)
 
