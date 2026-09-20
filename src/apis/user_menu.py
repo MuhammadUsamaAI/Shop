@@ -1,5 +1,4 @@
 import time
-#from src.apis.user_db import UserDBHandler
 from typing import Tuple
 from pydantic import TypeAdapter
 from src.manager import prompt_addition, prompt_negation, prompt_view
@@ -109,10 +108,10 @@ def shop_user_menu():
 def admin_manager_menu(acc_type:str, name: str, database:UserDBHandler) -> bool:
     while True:
         print(f'hello manager: {name}\n')
-        print('For Adding or Removing an account press 1')
-        print('For Shop Menu Press 2')
-        print('For Main Menu Press 3')
-        print('To Exit App Press 4')
+        print('For Adding or Removing an account press -------- 1')
+        print('For Shop Menu Press ---------------------------- 2')
+        print('To Logout Press -------------------------------- 3')
+        print('For Exiting Application Press ------------------ 4')
         selection = validation_function(user_choice_1_4,
                                         'please enter value')
         if selection == '1' or selection == 1:

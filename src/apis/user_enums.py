@@ -6,7 +6,7 @@ class UserEnum(str, Enum):
         return str(self.value)
 
     @classmethod
-    def _missing_(cls, value):
+    def _missing_(cls, value:str|int)->Enum | None:
         """Pydantic triggers this when Enum(value) raises a ValueError."""
         if isinstance(value, str):
             val_lower = value.strip().lower()
@@ -25,6 +25,7 @@ class UserTypesAdmin(UserEnum):
     USER = 'user'
     MANAGER = 'manager'
     ADMIN = 'admin'
+    LOGOUT = 'exit'
 
 
 class UserOptsYN(UserEnum):
@@ -48,6 +49,6 @@ class UserMenu(UserEnum):
     BUY = 'buy'
     SELL = 'sell'
     VIEW = 'view'
-    EXIT = 'exit'
     BACK = 'back'
     ENTER = 'enter'
+    EXIT = 'exit'
