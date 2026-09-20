@@ -152,4 +152,3 @@ class UserDBHandler:
             stmt = select(UserDB)
             for val in session.scalars(stmt):
                 print(val)
-
